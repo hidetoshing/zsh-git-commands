@@ -26,7 +26,7 @@ alias -g MODIFIED='$(git-select-modified)'
 # get file changed from master
 function git-select-changed()
 {
-    BRANCH='$(git-current-branch)'
+    BRANCH=$(git-current-branch)
     git diff --name-only master...${BRANCH} | fzy --prompt "GIT CHANGED FILE > "
 }
 alias -g CHANGED='$(git-select-changed)'
