@@ -17,4 +17,4 @@
 * BRANCH
 
 # function
-git-current-branch
+* git-current-branch
