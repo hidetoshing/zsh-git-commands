@@ -10,7 +10,7 @@ function git-current-branch()
 # get hash code from git log
 function git-select-hash()
 {
-    git log --oneline --branches | fzy --prompt "GIT HASH > " | awk '{print $1}'
+    git log --oneline --branches | fzy -l 24 -p "GIT HASH > " | awk '{print $1}'
 }
 alias -g HASH='$(git-select-hash)'
 
@@ -18,7 +18,7 @@ alias -g HASH='$(git-select-hash)'
 # get modified file
 function git-select-modified()
 {
-    git status --short | fzy --prompt "GIT MODIFIED FILE > " | awk '{print $2}'
+    git status --short | fzy -l 24 -p "GIT MODIFIED FILE > " | awk '{print $2}'
 }
 alias -g MODIFIED='$(git-select-modified)'
 
@@ -27,7 +27,7 @@ alias -g MODIFIED='$(git-select-modified)'
 function git-select-changed()
 {
     BRANCH=$(git-current-branch)
-    git diff --name-only master...${BRANCH} | fzy --prompt "GIT CHANGED FILE > "
+    git diff --name-only master...${BRANCH} | fzy -l 24 -p "GIT CHANGED FILE > "
 }
 alias -g CHANGED='$(git-select-changed)'
 
@@ -35,7 +35,7 @@ alias -g CHANGED='$(git-select-changed)'
 # get branch name
 function git-select-branch()
 {
-    git branch | fzy --prompt "GIT BRANCH > " | head -n 3 | sed -e "s/^\*\s*//g"
+    git branch | fzy -l 24 -p "GIT BRANCH > " | head -n 3 | sed -e "s/^\*\s*//g"
 }
 alias -g BRANCH='$(git-select-branch)'
 
