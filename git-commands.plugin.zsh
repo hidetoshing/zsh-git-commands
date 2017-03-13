@@ -1,4 +1,5 @@
 
+
 #####
 # get current branch
 function git-current-branch()
@@ -26,7 +27,7 @@ alias -g MODIFIED='$(git-select-modified)'
 # get file changed from master
 function git-select-changed()
 {
-    BRANCH=$(git-current-branch)
+    local BRANCH=$(git-current-branch)
     git diff --name-only master...${BRANCH} | fzy -l 24 -p "GIT CHANGED FILE > "
 }
 alias -g CHANGED='$(git-select-changed)'
@@ -39,3 +40,6 @@ function git-select-branch()
 }
 alias -g BRANCH='$(git-select-branch)'
 
+#####
+# for ghq
+alias repos='cd `ghq root`/`ghq list | fzy -l 24 -p "GIT REPOSITORY > "`'
