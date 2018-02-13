@@ -41,4 +41,4 @@ alias -g BRANCH='$(git-select-branch)'
 
 #####
 # for ghq
-alias repos='cd `ghq root`/`ghq list | fzf --reverse --height=24 --prompt="GIT REPOSITORY > "`'
+alias repos='cd `ghq root`/`ghq list | fzf --reverse --prompt="GIT REPOSITORY > "`'
