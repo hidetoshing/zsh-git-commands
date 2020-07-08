@@ -44,9 +44,9 @@ alias -g BRANCH='$(git-select-branch)'
 function git-goto-repository()
 {
     if [ $# != 1 ]; then
-        \cd `ghq root`/`ghq list | fzf --reverse --prompt="GIT REPOSITORY > "`
+        cd $(ghq list --full-path | fzf --reverse --prompt="GIT REPOSITORY > ")
     else
-        \cd `ghq root`/`ghq list | fzf --reverse --prompt="GIT REPOSITORY > " -q$1`
+        cd $(ghq list --full-path | fzf --reverse --prompt="GIT REPOSITORY > " -q${1})
     fi
 }
 alias repos='$(git-goto-repository)'
