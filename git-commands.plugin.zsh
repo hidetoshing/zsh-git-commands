@@ -49,5 +49,6 @@ function git-goto-repository()
         cd $(ghq list --full-path | fzf --reverse --prompt="GIT REPOSITORY > " -q${1})
     fi
 }
-alias repos='$(git-goto-repository)'
+alias repository='$(git-goto-repository)'
+alias repos='cd $(ghq list --full-path | fzf --reverse --prompt="GIT REPOSITORY > ")'
 
