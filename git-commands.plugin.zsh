@@ -10,7 +10,7 @@ function git-current-branch()
 # get hash code from git log
 function git-select-hash()
 {
-    git log --oneline --branches | fzf --reverse --height=24 --select-1 --prompt="GIT HASH > " | awk '{print $1}'
+    git log --oneline --branches | fzf-tmux -p --prompt="GIT HASH > " | awk '{print $1}'
 }
 alias -g HASH='$(git-select-hash)'
 
@@ -18,7 +18,7 @@ alias -g HASH='$(git-select-hash)'
 # get modified file
 function git-select-modified()
 {
-    git status --short | fzf --reverse --height=24 --select-1 --prompt="GIT MODIFIED FILE > " | awk '{print $2}'
+    git status --short | fzf-tmux -p --prompt="GIT MODIFIED FILE > " | awk '{print $2}'
 }
 alias -g MODIFIED='$(git-select-modified)'
 
@@ -27,7 +27,7 @@ alias -g MODIFIED='$(git-select-modified)'
 function git-select-changed()
 {
     local BRANCH=$(git-current-branch)
-    git diff --name-only master...${BRANCH} | fzf --reverse --height=24 --select-1 --prompt="GIT CHANGED FILE > "
+    git diff --name-only master...${BRANCH} | fzf-tmux -p --prompt="GIT CHANGED FILE > "
 }
 alias -g CHANGED='$(git-select-changed)'
 
@@ -35,7 +35,7 @@ alias -g CHANGED='$(git-select-changed)'
 # get branch name
 function git-select-branch()
 {
-    git branch | fzf --reverse --height=24 --select-1 --prompt="GIT BRANCH > " | head -n 3 | sed -e "s/^\*\s*//g"
+    git branch | fzf-tmux -p --prompt="GIT BRANCH > " | head -n 3 | sed -e "s/^\*\s*//g"
 }
 alias -g BRANCH='$(git-select-branch)'
 
@@ -50,4 +50,4 @@ function git-goto-repository()
     fi
 }
 alias repository='$(git-goto-repository)'
-alias repos='cd $(ghq root)/$(ghq list | fzf --reverse --prompt="GIT REPOSITORY > ")'
+alias repos='cd $(ghq root)/$(ghq list | fzf-tmux -p --prompt="GIT REPOSITORY > ")'
