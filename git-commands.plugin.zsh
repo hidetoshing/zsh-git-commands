@@ -41,13 +41,11 @@ alias -g BRANCH='$(git-select-branch)'
 
 #####
 # for ghq
-function git-goto-repository()
+function repos()
 {
     if [ $# != 1 ]; then
-        cd $(ghq list --full-path | fzf --reverse --prompt="GIT REPOSITORY > ")
+        cd $(ghq list --full-path | fzf-tmux -p -1 --prompt="GIT REPOSITORY > ")
     else
-        cd $(ghq list --full-path | fzf --reverse --prompt="GIT REPOSITORY > " -q${1})
+        cd $(ghq list --full-path | fzf-tmux -p -1 --prompt="GIT REPOSITORY > " -q"${@}")
     fi
 }
-alias repository='$(git-goto-repository)'
-alias repos='cd $(ghq root)/$(ghq list | fzf-tmux -p --prompt="GIT REPOSITORY > ")'
