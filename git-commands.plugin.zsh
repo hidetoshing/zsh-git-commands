@@ -1,3 +1,4 @@
+#!/usr/bin/env zsh
 
 #####
 # get current branch
