@@ -42,28 +42,16 @@ alias -g BRANCH='$(git-select-branch)'
 
 #####
 # for ghq
-### cd ghq project
-function ghq-fzf() {
-   
-    local src=$(ghq list | fzf-tmux -p --preview "bat --color=always --style=header,grid --line-range :80 $(ghq root)/{}/(README|readme).*")
-    if [ -n "$src" ]; then
-        BUFFER="cd $(ghq root)/$src"
-        zle accept-line
+function repos()
+{
+
+    if [ $# != 1 ]; then
+        local src=$(ghq list | fzf-tmux -p --preview "bat --color=always --style=header,grid --line-range :80 $(ghq root)/{}/(README|readme).*")
+    else
+        local src=$(ghq list | fzf-tmux -p --preview "bat --color=always --style=header,grid --line-range :80 $(ghq root)/{}/(README|readme).*" -q"${@}")
     fi
-    zle -R -c
+    cd $(ghq root)/${src}
 }
-zle -N ghq-fzf
-
-alias repos='ghq-fzf'
-
-#function repos()
-#{
-#    if [ $# != 1 ]; then
-#        cd $(ghq list --full-path | fzf-tmux -p -1 --prompt="GIT REPOSITORY > ")
-#    else
-#        cd $(ghq list --full-path | fzf-tmux -p -1 --prompt="GIT REPOSITORY > " -q"${@}")
-#    fi
-#}
 
 #####
 # for gh
