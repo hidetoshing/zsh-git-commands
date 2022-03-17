@@ -45,13 +45,12 @@ alias -g BRANCH='$(git-select-branch)'
 function repos()
 {
 
-    if [ $# != 1 ]; then
-        local src=$(ghq list | fzf-tmux -p 80% --preview "bat --color=always --style=header,grid --line-range :80 $(ghq root)/{}/(README|readme).*")
-    else
-        local src=$(ghq list | fzf-tmux -p 80% --preview "bat --color=always --style=header,grid --line-range :80 $(ghq root)/{}/(README|readme).*" -q"${@}")
-    fi
-    cd $(ghq root)/${src}
+    local repo=$(ghq list --unique ${@} | fzf-tmux -p 80%)
+    local path=$(ghq list --full-path -e ${repo})
+
+    cd ${path}
 }
+
 
 #####
 # for gh
