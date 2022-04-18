@@ -42,15 +42,13 @@ alias -g BRANCH='$(git-select-branch)'
 
 #####
 # for ghq
-function repos()
+function git-goto-repository()
 {
-
     local repo=$(ghq list --unique ${@} | fzf-tmux -p 80%)
     local path=$(ghq list --full-path -e ${repo})
-
     cd ${path}
 }
-
+alias repos='$(git-goto-repository)'
 
 #####
 # for gh
