@@ -48,7 +48,7 @@ function git-goto-repository()
     local path=$(ghq list --full-path -e ${repo})
     cd ${path}
 }
-alias repos='$(git-goto-repository)'
+alias repos='git-goto-repository'
 
 #####
 # for gh
