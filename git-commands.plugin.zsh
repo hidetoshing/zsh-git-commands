@@ -50,14 +50,12 @@ git-select-changed() {
 # ブランチ選択
 # ==========
 git-select-branch() {
-    echo "PATH Info"
-    echo $PATH
-
-    git for-each-ref --format="%(refname:short)" refs/heads \
+    git branch \
         | fzf-tmux -p 80% \
             --prompt="GIT BRANCH > " \
             --preview 'git log --oneline --decorate=short --color=always {1}' \
             --preview-window=right:70%
+        | head -n 3 | sed -e "s/^\*\s*//g"
 }
 
 # ==========
