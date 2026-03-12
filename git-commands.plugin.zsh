@@ -54,7 +54,7 @@ git-select-branch() {
         | fzf-tmux -p 80% \
             --prompt="GIT BRANCH > " \
             --preview 'git log --oneline --decorate=short --color=always {1}' \
-            --preview-window=right:70%
+            --preview-window=right:70% \
         | head -n 3 | sed -e "s/^\*\s*//g"
 }
 
