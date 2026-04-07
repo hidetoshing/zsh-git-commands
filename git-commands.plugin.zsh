@@ -68,7 +68,7 @@ git-goto-repository() {
     repo=$(ghq list --unique "$@" \
         | fzf-tmux -p 80% \
             --prompt="REPOSITORY > " \
-            --preview 'ghq list --full-path -e {} | xargs -I{} ls -1 {} | head -n 200' \
+            --preview 'root_path=$(ghq list --full-path -e {}) && [[ -n "$root_path" ]] && eza --tree --level=3 --color=always --group-directories-first "$root_path" | head -n 200' \
             --preview-window=right:70%)
 
     # キャンセル対応
@@ -91,7 +91,6 @@ git-goto-repository() {
 # gh + repos (alias の代わりに関数で安全に)
 # ==========
 repos() { git-goto-repository "$@"; }
-
 
 # ==========
 # GH CLI PR / ISSUE 選択
@@ -121,4 +120,3 @@ alias -g CHANGED='$(git-select-changed)'
 alias -g BRANCH='$(git-select-branch)'
 alias -g PR='$(gh-select-pr)'
 alias -g ISSUE='$(gh-select-issue)'
-
