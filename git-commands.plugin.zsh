@@ -132,11 +132,6 @@ git-cd-root() {
 }
 
 # ==========
-# gh + repos (alias の代わりに関数で安全に)
-# ==========
-repos() { git-goto-repository "$@"; }
-
-# ==========
 # GH CLI PR / ISSUE 選択
 # ==========
 gh-select-pr() {
@@ -164,3 +159,14 @@ alias -g CHANGED='$(git-select-changed)'
 alias -g BRANCH='$(git-select-branch)'
 alias -g PR='$(gh-select-pr)'
 alias -g ISSUE='$(gh-select-issue)'
+
+# ==========
+# gh + repos
+# ==========
+repos() { git-goto-repository "$@"; }
+
+# ==========
+# goto root
+# ==========
+root() { git-cd-root; }
+
