@@ -11,6 +11,29 @@ git-current-branch() {
 }
 
 # ==========
+# デフォルトブランチ名
+# ==========
+git-default-branch() {
+    local branch
+
+    branch=$(git symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null)
+    if [[ -n "$branch" ]]; then
+        echo "${branch#origin/}"
+        return 0
+    fi
+
+    for branch in main master; do
+        if git show-ref --verify --quiet "refs/heads/$branch" \
+            || git show-ref --verify --quiet "refs/remotes/origin/$branch"; then
+            echo "$branch"
+            return 0
+        fi
+    done
+
+    return 1
+}
+
+# ==========
 # Git log からハッシュ選択
 # ==========
 git-select-hash() {
@@ -29,20 +52,24 @@ git-select-modified() {
     git status --short \
         | fzf-tmux -p 80% \
             --prompt="MODIFIED FILE > " --nth=2.. \
-            --preview '[[ -f $(echo {} | awk "{print \$2}") ]] && bat --style=plain --color=always $(echo {} | awk "{print \$2}")' \
+            --preview 'path=$(printf "%s\n" "{}" | sed -E "s/^.. //; s#^.* -> ##") && [[ -n "$path" ]] && git diff --color=always -- "$path"' \
             --preview-window=right:70% \
-        | awk '{print $2}'
+        | sed -E 's/^.. //; s#^.* -> ##'
 }
 
 # ==========
-# master から変更のあるファイルを選択
+# デフォルトブランチから変更のあるファイルを選択
 # ==========
 git-select-changed() {
-    local BRANCH=$(git-current-branch)
-    git diff --name-only master..."${BRANCH}" \
+    local BRANCH BASE_BRANCH
+
+    BRANCH=$(git-current-branch)
+    BASE_BRANCH=$(git-default-branch) || return 1
+
+    git diff --name-only "${BASE_BRANCH}"..."${BRANCH}" \
         | fzf-tmux -p 80% \
             --prompt="CHANGED FILE > " \
-            --preview '[[ -f {} ]] && bat --style=plain --color=always {}' \
+            --preview "git diff --color=always ${BASE_BRANCH}...${BRANCH} -- \"{}\"" \
             --preview-window=right:70%
 }
 
@@ -53,9 +80,9 @@ git-select-branch() {
     git branch \
         | fzf-tmux -p 80% \
             --prompt="GIT BRANCH > " \
-            --preview 'git log --oneline --decorate=short --color=always {1}' \
+            --preview 'branch=$(printf "%s\n" "{}" | sed -E "s/^[*[:space:]]+//") && [[ -n "$branch" ]] && { echo "[Only in $branch]"; git log --graph --oneline --decorate=short --color=always HEAD.."$branch"; echo; echo "[Only in HEAD]"; git log --graph --oneline --decorate=short --color=always "$branch"..HEAD; }' \
             --preview-window=right:70% \
-        | head -n 3 | sed -e "s/^\*\s*//g"
+        | sed -E 's/^[*[:space:]]+//'
 }
 
 # ==========
@@ -88,6 +115,23 @@ git-goto-repository() {
 }
 
 # ==========
+# Git リポジトリ root へ移動
+# リポジトリ外では ghq 選択へフォールバック
+# ==========
+git-cd-root() {
+    local root_path
+
+    root_path=$(git rev-parse --show-toplevel 2>/dev/null)
+    if [[ -n "$root_path" ]]; then
+        echo "cd $root_path"
+        cd "$root_path"
+        return 0
+    fi
+
+    git-goto-repository "$@"
+}
+
+# ==========
 # gh + repos (alias の代わりに関数で安全に)
 # ==========
 repos() { git-goto-repository "$@"; }
@@ -98,7 +142,7 @@ repos() { git-goto-repository "$@"; }
 gh-select-pr() {
     gh pr list \
         | fzf-tmux -p --prompt="PR > " \
-            --preview 'gh pr view $(echo {} | cut -f1) --color=always' \
+            --preview 'num=$(printf "%s\n" "{}" | cut -f1) && gh pr view "$num" --json number,title,author,isDraft,reviewDecision,mergeStateStatus,statusCheckRollup,files --template "{{printf \"PR #%v %s\nAuthor: %s\nDraft: %v\nReview: %s\nMerge: %s\nChecks: %d\nFiles:\n\" .number .title .author.login .isDraft .reviewDecision .mergeStateStatus (len .statusCheckRollup)}}{{range .files}}{{printf \"  - %s\n\" .path}}{{end}}" | head -n 40' \
             --preview-window=right:70% \
         | head -n 1 | cut -f1
 }
@@ -106,7 +150,7 @@ gh-select-pr() {
 gh-select-issue() {
     gh issue list \
         | fzf-tmux -p --prompt="ISSUE > " \
-            --preview 'gh issue view $(echo {} | cut -f1) --color=always' \
+            --preview 'num=$(printf "%s\n" "{}" | cut -f1) && gh issue view "$num" --json number,title,state,author,labels,assignees,comments --template "{{printf \"Issue #%v %s\nState: %s\nAuthor: %s\nLabels: \" .number .title .state .author.login}}{{if .labels}}{{range $i, $label := .labels}}{{if $i}}, {{end}}{{printf \"%s\" $label.name}}{{end}}{{else}}-{{end}}{{printf \"\nAssignees: \"}}{{if .assignees}}{{range $i, $assignee := .assignees}}{{if $i}}, {{end}}{{printf \"%s\" $assignee.login}}{{end}}{{else}}-{{end}}{{printf \"\nComments: %d\n\" (len .comments)}}" | head -n 20' \
             --preview-window=right:70% \
         | head -n 1 | cut -f1
 }
